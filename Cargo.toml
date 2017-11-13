@@ -1,0 +1,17 @@
+[package]
+name = "mail-chars"
+version = "0.1.0"
+
+authors = ["Philipp Korber <p.korber@1aim.com>"]
+license = "MIT/Apache-2.0"
+
+description   = "provids char classification for mail related grammars"
+readme        = "README.md"
+documentation = "https://docs.rs/mail-chars"
+repository    = "https://github.com/1aim/mail-chars"
+keywords      = []
+categories    = ["encoding"]
+
+[badges]
+travis-ci = { repository = "1aim/mail-chars", branch = "master" }
+maintenance = { status = "actively-developed" }
