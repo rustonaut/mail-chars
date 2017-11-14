@@ -16,33 +16,25 @@
 //! # Example
 //!
 //! ```rust
-//! use mail_chars::{rfc5322, rfc2045, CharMatchExt};
+//! extern crate mail_chars;
+//! use mail_chars::{Charsets, rfc5322, rfc2045, CharMatchExt};
 //!
-//! fn is_token(input: &str) -> bool {
-//!     input.chars().all(|ch| ch.is(rfc2045::Token))
+//! fn main() {
+//!     assert!(Charsets::AText.contains('d'));
+//!     assert!('d'.is(Charsets::AText));
+//!     assert!('d'.is(rfc5322::AText));
+//!
+//!     // rfc*::* are just reexports grouped by rfc
+//!     assert_eq!(Charsets::Token, rfc2045::Token);
+//!
+//!     // if we want to test for more than on char set we can use lookup
+//!     let res = Charsets::lookup('.');
+//!     // has the benefit that there is a is_ascii method
+//!     assert!(res.is_ascii());
+//!     assert!(res.is(rfc2045::Token));
+//!     assert!(res.is(rfc5322::CText));
+//!     assert!(!res.is(rfc5322::AText));
 //! }
-//!
-//! assert!(is_token("abc-def"));
-//! assert!(!is_token("abc de"));
-//!
-//! fn simple_quote(input: &str) -> String {
-//!     let mut out = String::with_capacity(input.len()+2);
-//!     out.push('"');
-//!     for ch in input.chars() {
-//!         if ch.is_inkl_non_ascii(rfc5322::QTextWs) {
-//!             out.push(ch);
-//!         } else if ch == '\\' || ch == '"' {
-//!             out.push('\\');
-//!             out.push(ch);
-//!         } else {
-//!             panic!("wupsi dupsi that wont work ;=)");
-//!         }
-//!     }
-//!     out.push('"');
-//!     out
-//! }
-//!
-//! assert_eq!(simple_quote("this \" is it"), "\"this \\\" is it\"");
 //! ```
 
 mod lookup;
