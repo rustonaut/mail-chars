@@ -205,9 +205,14 @@ pub fn is_ws(ch: char) -> bool {
     ch == ' ' || ch  == '\t'
 }
 
+#[inline]
+pub fn is_vchar(ch: char) -> bool {
+    ' ' < ch && ch <= '~'
+}
+
 #[cfg(test)]
 mod test {
-    use super::{Charset, CharMatchExt};
+    use super::{Charset, CharMatchExt, is_vchar};
 
     #[test]
     fn lookup_result_ascii() {
@@ -242,5 +247,20 @@ mod test {
         let first_char_not_in_table = '\u{80}';
         assert!(!first_char_not_in_table.is(Charset::CText));
         assert!(first_char_not_in_table.is_inkl_non_ascii(Charset::CText));
+    }
+
+    #[test]
+    fn is_vchar_boundaries() {
+        let min = '!';
+        let min_m1 = ' ';
+        assert_eq!(min as u32 - 1, min_m1 as u32);
+        let max = '~';
+        let max_p1 = '\u{7f}';
+        assert_eq!(max as u32 + 1, max_p1 as u32);
+
+        assert!(is_vchar(min));
+        assert!(!is_vchar(min_m1));
+        assert!(is_vchar(max));
+        assert!(!is_vchar(max_p1));
     }
 }
