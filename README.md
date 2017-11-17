@@ -1,9 +1,12 @@
-mail-chars [![Crates.io](https://img.shields.io/crates/v/mail-chars.svg)](https://crates.io/crates/quoted-string) [![quoted-string](https://docs.rs/quoted-string/badge.svg)](https://docs.rs/quoted-string) [![License](https://img.shields.io/badge/License-MIT%2FApache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Build Status](https://travis-ci.org/1aim/quoted-string.svg?branch=master)](https://travis-ci.org/1aim/mail-chars)
+mail-chars [![Crates.io](https://img.shields.io/crates/v/mail-chars.svg)](https://crates.io/crates/mail-chars) [![mail-chars](https://docs.rs/mail-chars/badge.svg)](https://docs.rs/mail-chars) [![License](https://img.shields.io/badge/License-MIT%2FApache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Build Status](https://travis-ci.org/1aim/mail-chars.svg?branch=master)](https://travis-ci.org/1aim/mail-chars)
 =============
 
-provides char classification for mail related grammar parts / charset
+provides lookup table based char classification for mail related grammar parts / charset
 
-For example if a given char belongs characters valid in atext, ctext, dtext, token etc.
+I.e. if a given char is valid in atext, ctext, dtext, token etc.
+
+Note that this just covers grammar parts defining sets of chars (like atext, ctext, ...)
+but not contextual parts like e.g. quoted-pairs. 
 
 ```rust
 extern crate mail_chars;
