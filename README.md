@@ -7,18 +7,18 @@ For example if a given char belongs characters valid in atext, ctext, dtext, tok
 
 ```rust
 extern crate mail_chars;
-use mail_chars::{Charsets, rfc5322, rfc2045, CharMatchExt};
+use mail_chars::{Charset, rfc5322, rfc2045, CharMatchExt};
 
 fn main() {
-    assert!(Charsets::AText.contains('d'));
-    assert!('d'.is(Charsets::AText));
+    assert!(Charset::AText.contains('d'));
+    assert!('d'.is(Charset::AText));
     assert!('d'.is(rfc5322::AText));
     
     // rfc*::* are just reexports grouped by rfc
-    assert_eq!(Charsets::Token, rfc2045::Token);
+    assert_eq!(Charset::Token, rfc2045::Token);
     
     // if we want to test for more than on char set we can use lookup
-    let res = Charsets::lookup('.');
+    let res = Charset::lookup('.');
     // has the benefit that there is a is_ascii method 
     assert!(res.is_ascii());
     assert!(res.is(rfc2045::Token));

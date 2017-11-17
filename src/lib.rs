@@ -3,7 +3,7 @@
 //!
 //! For example if a given char belongs characters valid in atext, ctext, dtext, token etc.
 //!
-//! The `Charsets` enum is used to determine which set of character is used.
+//! The `Charset` enum is used to determine which set of character is used.
 //! To check if a `char` is in that set either use `Charset::contains(&self, char)`.
 //! Or use `ch.is(charset)` which is provided through the `CharMatchExt` extension trait.
 //!
@@ -17,18 +17,18 @@
 //!
 //! ```rust
 //! extern crate mail_chars;
-//! use mail_chars::{Charsets, rfc5322, rfc2045, CharMatchExt};
+//! use mail_chars::{Charset, rfc5322, rfc2045, CharMatchExt};
 //!
 //! fn main() {
-//!     assert!(Charsets::AText.contains('d'));
-//!     assert!('d'.is(Charsets::AText));
+//!     assert!(Charset::AText.contains('d'));
+//!     assert!('d'.is(Charset::AText));
 //!     assert!('d'.is(rfc5322::AText));
 //!
 //!     // rfc*::* are just reexports grouped by rfc
-//!     assert_eq!(Charsets::Token, rfc2045::Token);
+//!     assert_eq!(Charset::Token, rfc2045::Token);
 //!
 //!     // if we want to test for more than on char set we can use lookup
-//!     let res = Charsets::lookup('.');
+//!     let res = Charset::lookup('.');
 //!     // has the benefit that there is a is_ascii method
 //!     assert!(res.is_ascii());
 //!     assert!(res.is(rfc2045::Token));
@@ -42,7 +42,7 @@ mod lookup;
 /// A enum for the charsets represented through an internal lookup table
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
 #[repr(u8)]
-pub enum Charsets {
+pub enum Charset {
     /// qtext + ws basically anything which can appear in a quoted string which is not a quoted-pair
     ///
     /// **rfc: 5322**
@@ -77,7 +77,7 @@ pub enum Charsets {
     Token = lookup::TO
 }
 
-impl Charsets {
+impl Charset {
 
     /// returns true if the char is part of this set of chars
     #[inline]
@@ -118,19 +118,19 @@ mod sealed{ pub trait Seal {} }
 pub use self::sealed::Seal;
 pub trait CharMatchExt: Seal+Copy {
     /// returns true if the char is a char belonging to the given charset
-    fn is(self, charset: Charsets) -> bool;
+    fn is(self, charset: Charset) -> bool;
     /// returns true if the char is a char belonging to the given charset or a non-us-ascii char
-    fn is_inkl_non_ascii(self, charset: Charsets) -> bool;
+    fn is_inkl_non_ascii(self, charset: Charset) -> bool;
 }
 
 impl Seal for char {}
 impl CharMatchExt for char {
     #[inline]
-    fn is(self, charset: Charsets) -> bool {
+    fn is(self, charset: Charset) -> bool {
         charset.contains(self)
     }
     #[inline]
-    fn is_inkl_non_ascii(self, charset: Charsets) -> bool {
+    fn is_inkl_non_ascii(self, charset: Charset) -> bool {
         charset.contains_or_non_ascii(self)
     }
 }
@@ -143,18 +143,18 @@ impl CharMatchExt for char {
 /// # Example
 ///
 /// ```
-/// use mail_chars::{Charsets, CharMatchExt};
+/// use mail_chars::{Charset, CharMatchExt};
 ///
-/// let res = Charsets::lookup('↓');
+/// let res = Charset::lookup('↓');
 /// assert!(!res.is_ascii());
-/// assert!(!res.is(Charsets::QTextWs));
-/// assert!(res.is_inkl_non_ascii(Charsets::QTextWs));
+/// assert!(!res.is(Charset::QTextWs));
+/// assert!(res.is_inkl_non_ascii(Charset::QTextWs));
 ///
-/// let res = Charsets::lookup('<');
+/// let res = Charset::lookup('<');
 /// assert!(res.is_ascii());
-/// assert!(res.is(Charsets::QTextWs));
-/// assert!(res.is(Charsets::CText));
-/// assert!(!res.is(Charsets::AText));
+/// assert!(res.is(Charset::QTextWs));
+/// assert!(res.is(Charset::CText));
+/// assert!(!res.is(Charset::AText));
 /// ```
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct LookupResult(Option<u8>);
@@ -165,7 +165,7 @@ impl LookupResult {
         self.0.is_some()
     }
 
-    fn lookup_contains(&self, charset: Charsets, default: bool) -> bool {
+    fn lookup_contains(&self, charset: Charset, default: bool) -> bool {
         self.0.map(|res| {
             res & (charset as u8) != 0
         }).unwrap_or(default)
@@ -175,32 +175,72 @@ impl LookupResult {
 impl Seal for LookupResult {}
 impl CharMatchExt for LookupResult {
     #[inline]
-    fn is(self, charset: Charsets) -> bool {
+    fn is(self, charset: Charset) -> bool {
         self.lookup_contains(charset, false)
     }
     #[inline]
-    fn is_inkl_non_ascii(self, charset: Charsets) -> bool {
+    fn is_inkl_non_ascii(self, charset: Charset) -> bool {
         self.lookup_contains(charset, true)
     }
 }
 
 /// reexport of all charsets (Charset::... variants) from rfc5322
 pub mod rfc5322 {
-    pub use super::Charsets::{QTextWs, CText, AText, DText};
+    pub use super::Charset::{QTextWs, CText, AText, DText};
 }
 
 /// reexport of all charsets (Charset::... variants) from rfc2045
 pub mod rfc2045 {
-    pub use super::Charsets::Token;
+    pub use super::Charset::Token;
 }
 
 /// reexport of all charsets (Charset::... variants) from rfc6838
 pub mod rfc6838 {
-    pub use super::Charsets::RestrictedToken;
+    pub use super::Charset::RestrictedToken;
 }
 
 
 #[inline]
 pub fn is_ws(ch: char) -> bool {
     ch == ' ' || ch  == '\t'
+}
+
+#[cfg(test)]
+mod test {
+    use super::{Charset, CharMatchExt};
+
+    #[test]
+    fn lookup_result_ascii() {
+        let res = Charset::lookup('<');
+        assert!(res.is_ascii());
+        assert!(res.is(Charset::QTextWs));
+        assert!(res.is_inkl_non_ascii(Charset::QTextWs));
+        assert!(res.is(Charset::CText));
+        assert!(res.is_inkl_non_ascii(Charset::CText));
+        assert!(!res.is(Charset::AText));
+        assert!(!res.is_inkl_non_ascii(Charset::AText));
+    }
+
+    #[test]
+    fn lookup_result_utf8() {
+        let res = Charset::lookup('↓');
+        assert!(!res.is_ascii());
+        assert!(!res.is(Charset::QTextWs));
+        assert!(res.is_inkl_non_ascii(Charset::QTextWs));
+    }
+
+    #[test]
+    fn is_part_of_charset() {
+        // just a "general" check if it works, any specific checks
+        // about which chars belong to which set of chars is handled
+        // in the lookup modules tests
+        assert!('<'.is(Charset::QTextWs));
+        assert!('<'.is_inkl_non_ascii(Charset::QTextWs));
+        assert!(!'<'.is(Charset::AText));
+        assert!(!'<'.is_inkl_non_ascii(Charset::AText));
+
+        let first_char_not_in_table = '\u{80}';
+        assert!(!first_char_not_in_table.is(Charset::CText));
+        assert!(first_char_not_in_table.is_inkl_non_ascii(Charset::CText));
+    }
 }
