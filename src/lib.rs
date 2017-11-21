@@ -214,8 +214,16 @@ pub mod rfc6838 {
     pub use super::Charset::RestrictedToken;
 }
 
+/// reexport of all charsets (Charset::... variants) from rfc7320
+///
+/// Note that QTextWs (rfc5322) is exported as Qdtext (rfc7320) as they
+/// are the equivalent (if the obsolete part of both grammars is excluded)
 pub mod rfc7230 {
-    pub use super::Charset::{Rfc7230Token as Token};
+    pub use super::Charset::{
+        QTextWs as QDText,
+        Rfc7230Token as Token
+    };
+
 }
 
 
