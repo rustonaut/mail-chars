@@ -45,10 +45,16 @@ mod lookup;
 pub enum Charset {
     /// qtext + ws basically anything which can appear in a quoted string which is not a quoted-pair
     ///
+    /// Note: this is equivalent to rfc7230 qdtext, excluding the obsolete part of the grammar
+    ///
+    /// Note: the obsolete part of the grammar is excluded
+    ///
     /// **rfc: 5322**
     QTextWs = lookup::QC,
 
     /// ctext
+    ///
+    /// Note: the obsolete part of the grammar is excluded
     ///
     /// **rfc: 5322**
     CText = lookup::CT,
@@ -81,6 +87,19 @@ pub enum Charset {
     /// **rfc: 5322**
     ///
     /// combine with CText or QText to support the obsolete part of the grammar
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use mail_chars::{Charset, CharMatchExt, rfc5322};
+    ///
+    /// fn is_ctext_with_obs(ch: char) -> bool {
+    ///     let res = Charset::lookup(ch);
+    ///     res.is(rfc5322::CText) || res.is(rfc5322::ObsNoWsCtl)
+    /// }
+    ///
+    /// assert!("\x01comment\x02".chars().all(is_ctext_with_obs));
+    /// ```
     ObsNoWsCtl = lookup::NC,
 
     /// token
