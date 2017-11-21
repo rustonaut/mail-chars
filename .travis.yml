@@ -12,6 +12,3 @@ matrix:
   allow_failures:
     - rust: nightly
 
-script:
-  - cargo test --verbose
-  - rustdoc --test README.md -L target/debug/deps/
