@@ -74,7 +74,22 @@ pub enum Charset {
     ///
     /// Note there are multiple mail related definitions of token, this one is the rfc2045 based
     /// one.
-    Token = lookup::TO
+    Token = lookup::TO,
+
+    /// obs-NO-WS-CTL
+    ///
+    /// **rfc: 5322**
+    ///
+    /// combine with CText or QText to support the obsolete part of the grammar
+    ObsNoWsCtl = lookup::NC,
+
+    /// token
+    ///
+    /// **rfc: 7230**
+    ///
+    /// Token as defined in rfc7230 (HTTP/1.1) not directly a mail grammar, but relevant for shared
+    /// utilities like e.g. anything Media Type (i.e. MIME-Type/Content-Type) related
+    Rfc7230Token = lookup::HT
 }
 
 impl Charset {
@@ -197,6 +212,10 @@ pub mod rfc2045 {
 /// reexport of all charsets (Charset::... variants) from rfc6838
 pub mod rfc6838 {
     pub use super::Charset::RestrictedToken;
+}
+
+pub mod rfc7230 {
+    pub use super::Charset::{Rfc7230Token as Token};
 }
 
 

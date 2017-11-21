@@ -29,34 +29,41 @@ pub const QC: u8 = 0b00001000;
 pub const RT: u8 = 0b00010000;
 /// token (rfc5322)
 pub const TO: u8 = 0b00100000;
+/// obs-NO-WS-CTL (rfc5322)
+pub const NC: u8 = 0b01000000;
+/// token (rfc7230) HTTP/1.1 media type token is only _mostly_ the same so it needs it's own
+/// lookup. While it does not fit perfectly into the crate there is one slot left (and while
+/// there are other thinks they tend to require more than one slot)
+pub const HT: u8 = 0b10000000;
+
 
 
 pub static US_ASCII_LOOKUP: &[u8] = &[
     //0x00
-    //0/8              1/9                2/A                3/B                4/C                5/D                6/E                7/F
-    0,                 0,                 0,                 0,                 0,                 0,                 0,                 0,
-    0,                 QC,                0,                 0,                 0,                 0,                 0,                 0,
-    //0x10                                                                                                                               
-    0,                 0,                 0,                 0,                 0,                 0,                 0,                 0,
-    0,                 0,                 0,                 0,                 0,                 0,                 0,                 0,
-    //0x20                                                                                                                               
-    QC,                CT|DT|AT|QC|RT|TO, CT|DT,             CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|TO,    CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|TO,
-    DT|QC,             DT|QC,             CT|DT|AT|QC|TO,    CT|DT|AT|QC|RT|TO, CT|DT|QC,          CT|DT|AT|QC|RT|TO, CT|DT|QC|RT|TO,    CT|DT|AT|QC,
-    //0x30                                                                                                                               
-    CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO,
-    CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|QC,          CT|DT|QC,          CT|DT|QC,          CT|DT|AT|QC,       CT|DT|QC,          CT|DT|AT|QC,
-    //0x40                                                                                                                               
-    CT|DT|QC,          CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO,
-    CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO,
-    //0x50                                                                                                                               
-    CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO,
-    CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|QC,             0,                 CT|QC,             CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO,
-    //0x60                                                                                                                               
-    CT|DT|AT|QC|TO,    CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO,
-    CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO,
-    //0x70                                                                                                                               
-    CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO,
-    CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|RT|TO, CT|DT|AT|QC|TO,    CT|DT|AT|QC|TO,    CT|DT|AT|QC|TO,    CT|DT|AT|QC|TO,    0,
+    //0/8                    1/9                   2/A                   3/B                   4/C                   5/D                   6/E                      7/F
+    0,                       NC,                   NC,                   NC,                   NC,                   NC,                   NC,                      NC,
+    NC,                      QC,                   0,                    NC,                   NC,                   0,                    NC,                      NC,
+    //0x10
+    NC,                      NC,                   NC,                   NC,                   NC,                   NC,                   NC,                      NC,
+    NC,                      NC,                   NC,                   NC,                   NC,                   NC,                   NC,                      NC,
+    //0x20
+    QC,                      CT|DT|AT|QC|RT|TO|HT, CT|DT,                CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|TO|HT,    CT|DT|AT|QC|RT|TO|HT,    CT|DT|AT|QC|TO|HT,
+    DT|QC,                   DT|QC,                CT|DT|AT|QC|TO|HT,    CT|DT|AT|QC|RT|TO|HT, CT|DT|QC,             CT|DT|AT|QC|RT|TO|HT, CT|DT|QC|RT|TO|HT,       CT|DT|AT|QC,
+    //0x30
+    CT|DT|AT|QC|RT|TO|HT,    CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT,    CT|DT|AT|QC|RT|TO|HT,
+    CT|DT|AT|QC|RT|TO|HT,    CT|DT|AT|QC|RT|TO|HT, CT|DT|QC,             CT|DT|QC,             CT|DT|QC,             CT|DT|AT|QC,          CT|DT|QC,                CT|DT|AT|QC,
+    //0x40
+    CT|DT|QC,                CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT,    CT|DT|AT|QC|RT|TO|HT,
+    CT|DT|AT|QC|RT|TO|HT,    CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT,    CT|DT|AT|QC|RT|TO|HT,
+    //0x50
+    CT|DT|AT|QC|RT|TO|HT,    CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT,    CT|DT|AT|QC|RT|TO|HT,
+    CT|DT|AT|QC|RT|TO|HT,    CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|QC,                0,                    CT|QC,                CT|DT|AT|QC|RT|TO|HT,    CT|DT|AT|QC|RT|TO|HT,
+    //0x60
+    CT|DT|AT|QC|TO|HT,       CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT,    CT|DT|AT|QC|RT|TO|HT,
+    CT|DT|AT|QC|RT|TO|HT,    CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT,    CT|DT|AT|QC|RT|TO|HT,
+    //0x70
+    CT|DT|AT|QC|RT|TO|HT,    CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT,    CT|DT|AT|QC|RT|TO|HT,
+    CT|DT|AT|QC|RT|TO|HT,    CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|TO,       CT|DT|AT|QC|TO|HT,    CT|DT|AT|QC|TO,       CT|DT|AT|QC|TO|HT,       NC,
     //0x80
 ];
 
@@ -126,7 +133,7 @@ mod test {
         }
     }
 
-    fn is_ctext( ch: char ) -> bool {
+    fn is_ctext(ch: char) -> bool {
         match ch {
             '!'...'\'' |
             '*'...'[' |
@@ -134,6 +141,32 @@ mod test {
             // obs-ctext
             _ => false
         }
+    }
+
+    fn is_no_ws_ctl(ch: char) -> bool {
+        let bch = ch as u32;
+
+        match bch {
+            1...8 |
+            11 | 12 |
+            14...31 |
+            127 => true,
+            _ => false
+        }
+    }
+
+    fn is_rfc7230_token(ch: char) -> bool {
+        match ch {
+            '!'  | '#' | '$' | '%' | '&' |
+            '\'' | '*' | '+' | '-' | '.' |
+            '^'  | '_' | '`' | '|' | '~' |
+            'a'...'z' |
+            'A'...'Z' |
+            '0'...'9' => true,
+            _ => false
+
+        }
+
     }
 
     macro_rules! cmp {
@@ -160,6 +193,8 @@ mod test {
             cmp!(idx, res, AT, is_atext);
             cmp!(idx, res, DT, is_dtext);
             cmp!(idx, res, CT, is_ctext);
+            cmp!(idx, res, HT, is_rfc7230_token);
+            cmp!(idx, res, NC, is_no_ws_ctl);
         }
     }
 }
