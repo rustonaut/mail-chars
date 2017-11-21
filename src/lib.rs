@@ -201,7 +201,7 @@ impl CharMatchExt for LookupResult {
 
 /// reexport of all charsets (Charset::... variants) from rfc5322
 pub mod rfc5322 {
-    pub use super::Charset::{QTextWs, CText, AText, DText};
+    pub use super::Charset::{QTextWs, CText, AText, DText, ObsNoWsCtl};
 }
 
 /// reexport of all charsets (Charset::... variants) from rfc2045
