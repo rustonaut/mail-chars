@@ -42,12 +42,12 @@ pub static US_ASCII_LOOKUP: &[u8] = &[
     //0x00
     //0/8                    1/9                   2/A                   3/B                   4/C                   5/D                   6/E                      7/F
     0,                       NC,                   NC,                   NC,                   NC,                   NC,                   NC,                      NC,
-    NC,                      QC,                   0,                    NC,                   NC,                   0,                    NC,                      NC,
+    NC,                      CT|DT|QC,             0,                    NC,                   NC,                   0,                    NC,                      NC,
     //0x10
     NC,                      NC,                   NC,                   NC,                   NC,                   NC,                   NC,                      NC,
     NC,                      NC,                   NC,                   NC,                   NC,                   NC,                   NC,                      NC,
     //0x20
-    QC,                      CT|DT|AT|QC|RT|TO|HT, CT|DT,                CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|TO|HT,    CT|DT|AT|QC|RT|TO|HT,    CT|DT|AT|QC|TO|HT,
+    CT|DT|QC,                CT|DT|AT|QC|RT|TO|HT, CT|DT,                CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|TO|HT,    CT|DT|AT|QC|RT|TO|HT,    CT|DT|AT|QC|TO|HT,
     DT|QC,                   DT|QC,                CT|DT|AT|QC|TO|HT,    CT|DT|AT|QC|RT|TO|HT, CT|DT|QC,             CT|DT|AT|QC|RT|TO|HT, CT|DT|QC|RT|TO|HT,       CT|DT|AT|QC,
     //0x30
     CT|DT|AT|QC|RT|TO|HT,    CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT, CT|DT|AT|QC|RT|TO|HT,    CT|DT|AT|QC|RT|TO|HT,
@@ -125,17 +125,19 @@ mod test {
         }
     }
 
-    fn is_dtext( ch: char ) -> bool {
+    fn is_dtext_ws( ch: char ) -> bool {
         match ch as u32 {
-            33...90 |
+            9 |
+            32...90 |
             94...126 => true,
             _ => false
         }
     }
 
-    fn is_ctext(ch: char) -> bool {
+    fn is_ctext_ws(ch: char) -> bool {
         match ch {
-            '!'...'\'' |
+            '\t' |
+            ' '...'\'' |
             '*'...'[' |
             ']'...'~' => true,
             // obs-ctext
@@ -191,8 +193,8 @@ mod test {
             cmp!(idx, res, RT, is_restricted_char);
             cmp!(idx, res, TO, is_token);
             cmp!(idx, res, AT, is_atext);
-            cmp!(idx, res, DT, is_dtext);
-            cmp!(idx, res, CT, is_ctext);
+            cmp!(idx, res, DT, is_dtext_ws);
+            cmp!(idx, res, CT, is_ctext_ws);
             cmp!(idx, res, HT, is_rfc7230_token);
             cmp!(idx, res, NC, is_no_ws_ctl);
         }

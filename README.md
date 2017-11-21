@@ -25,7 +25,7 @@ fn main() {
     // has the benefit that there is a is_ascii method 
     assert!(res.is_ascii());
     assert!(res.is(rfc2045::Token));
-    assert!(res.is(rfc5322::CText));
+    assert!(res.is(rfc5322::CTextWs));
     assert!(!res.is(rfc5322::AText));
 }
 ```

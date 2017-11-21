@@ -7,6 +7,20 @@
 //! To check if a `char` is in that set either use `Charset::contains(&self, char)`.
 //! Or use `ch.is(charset)` which is provided through the `CharMatchExt` extension trait.
 //!
+//! # Why Ws is merged into CText, DText and QText
+//!
+//! Any grammar part in which qtext/ctext/dtext is used is in a form
+//! which 1. repeats 2. prepends FWS in the repeating part.
+//!
+//! Which means any parser would have to parse for chars which
+//! are qtext/ctext/dtext OR ws (and special handling if it hits another
+//! character like "\r" indicating the start of a soft line breake etc.)
+//!
+//! For example wrt. dtext the grammar is `... *([FWS] dtext) [FWS] ...`
+//! which you can validate by parsing chars which are either dtext or ws
+//! and if you hit a "\r" (which btw. is _not_ in ws) you make sure it's
+//! followed by "\n " or "\n\t" and then you continue with parsing
+//!
 //! # Alternative interface
 //!
 //! All enum variant are reexported under a module with the name of the rfc where
@@ -32,7 +46,7 @@
 //!     // has the benefit that there is a is_ascii method
 //!     assert!(res.is_ascii());
 //!     assert!(res.is(rfc2045::Token));
-//!     assert!(res.is(rfc5322::CText));
+//!     assert!(res.is(rfc5322::CTextWs));
 //!     assert!(!res.is(rfc5322::AText));
 //! }
 //! ```
@@ -52,17 +66,17 @@ pub enum Charset {
     /// **rfc: 5322**
     QTextWs = lookup::QC,
 
-    /// ctext
+    /// ctext + ws
     ///
     /// Note: the obsolete part of the grammar is excluded
     ///
     /// **rfc: 5322**
-    CText = lookup::CT,
+    CTextWs = lookup::CT,
 
-    /// dtext
+    /// dtext + ws
     ///
     /// **rfc: 5322**
-    DText = lookup::DT,
+    DTextWs = lookup::DT,
 
     /// atext
     ///
@@ -95,10 +109,10 @@ pub enum Charset {
     ///
     /// fn is_ctext_with_obs(ch: char) -> bool {
     ///     let res = Charset::lookup(ch);
-    ///     res.is(rfc5322::CText) || res.is(rfc5322::ObsNoWsCtl)
+    ///     res.is(rfc5322::CTextWs) || res.is(rfc5322::ObsNoWsCtl)
     /// }
     ///
-    /// assert!("\x01comment\x02".chars().all(is_ctext_with_obs));
+    /// assert!("\x01 comment \x02".chars().all(is_ctext_with_obs));
     /// ```
     ObsNoWsCtl = lookup::NC,
 
@@ -187,7 +201,7 @@ impl CharMatchExt for char {
 /// let res = Charset::lookup('<');
 /// assert!(res.is_ascii());
 /// assert!(res.is(Charset::QTextWs));
-/// assert!(res.is(Charset::CText));
+/// assert!(res.is(Charset::CTextWs));
 /// assert!(!res.is(Charset::AText));
 /// ```
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
@@ -220,7 +234,7 @@ impl CharMatchExt for LookupResult {
 
 /// reexport of all charsets (Charset::... variants) from rfc5322
 pub mod rfc5322 {
-    pub use super::Charset::{QTextWs, CText, AText, DText, ObsNoWsCtl};
+    pub use super::Charset::{QTextWs, CTextWs, AText, DTextWs, ObsNoWsCtl};
 }
 
 /// reexport of all charsets (Charset::... variants) from rfc2045
@@ -266,8 +280,8 @@ mod test {
         assert!(res.is_ascii());
         assert!(res.is(Charset::QTextWs));
         assert!(res.is_inkl_non_ascii(Charset::QTextWs));
-        assert!(res.is(Charset::CText));
-        assert!(res.is_inkl_non_ascii(Charset::CText));
+        assert!(res.is(Charset::CTextWs));
+        assert!(res.is_inkl_non_ascii(Charset::CTextWs));
         assert!(!res.is(Charset::AText));
         assert!(!res.is_inkl_non_ascii(Charset::AText));
     }
@@ -291,8 +305,8 @@ mod test {
         assert!(!'<'.is_inkl_non_ascii(Charset::AText));
 
         let first_char_not_in_table = '\u{80}';
-        assert!(!first_char_not_in_table.is(Charset::CText));
-        assert!(first_char_not_in_table.is_inkl_non_ascii(Charset::CText));
+        assert!(!first_char_not_in_table.is(Charset::CTextWs));
+        assert!(first_char_not_in_table.is_inkl_non_ascii(Charset::CTextWs));
     }
 
     #[test]
