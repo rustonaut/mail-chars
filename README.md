@@ -1,12 +1,10 @@
 mail-chars [![Crates.io](https://img.shields.io/crates/v/mail-chars.svg)](https://crates.io/crates/mail-chars) [![mail-chars](https://docs.rs/mail-chars/badge.svg)](https://docs.rs/mail-chars) [![License](https://img.shields.io/badge/License-MIT%2FApache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Build Status](https://travis-ci.org/1aim/mail-chars.svg?branch=master)](https://travis-ci.org/1aim/mail-chars)
-=============
+==========
+Provides lookup table based char classification for mail related grammar
+parts/charset, i.e. if a given char is valid in atext, ctext, dtext, token etc.
 
-provides lookup table based char classification for mail related grammar parts / charset
-
-I.e. if a given char is valid in atext, ctext, dtext, token etc.
-
-Note that this just covers grammar parts defining sets of chars (like atext, ctext, ...)
-but not contextual parts like e.g. quoted-pairs. 
+Note that this just covers grammar parts defining sets of chars (like atext,
+ctext, ...) but not contextual parts like e.g. quoted-pairs. 
 
 ```rust
 extern crate mail_chars;
@@ -17,12 +15,13 @@ fn main() {
     assert!('d'.is(Charset::AText));
     assert!('d'.is(rfc5322::AText));
     
-    // rfc*::* are just reexports grouped by rfc
+    // `rfc*::*` are just re-exports grouped by RFC.
     assert_eq!(Charset::Token, rfc2045::Token);
     
-    // if we want to test for more than on char set we can use lookup
+    // If we want to test for more than on char set we can use lookup.
     let res = Charset::lookup('.');
-    // has the benefit that there is a is_ascii method 
+
+    // This has the benefit that there is an `is_ascii` method.
     assert!(res.is_ascii());
     assert!(res.is(rfc2045::Token));
     assert!(res.is(rfc5322::CTextWs));

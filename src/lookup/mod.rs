@@ -17,26 +17,27 @@
 //
 //}
 
-/// ctext (rfc5322)
+/// `ctext` (rfc5322)
 pub const CT: u8 = 0b00000001;
-/// dtext (rfc5322)
+/// `dtext` (rfc5322)
 pub const DT: u8 = 0b00000010;
-/// atext (rfc5322)
+/// `atext` (rfc5322)
 pub const AT: u8 = 0b00000100;
-/// qtext + ws (rfc5322) (or the content of quoted strings without quoted-pairs)
+/// `qtext` + `ws` (rfc5322) (or the content of quoted strings without
+/// quoted-pairs)
 pub const QC: u8 = 0b00001000;
-/// restricted-name-char (rfc6838)  (which is like a restricted token hence RT)
+/// Restricted-name-char (rfc6838)  (which is like a restricted token hence
+/// RT).
 pub const RT: u8 = 0b00010000;
-/// token (rfc5322)
+/// `token` (rfc5322)
 pub const TO: u8 = 0b00100000;
 /// obs-NO-WS-CTL (rfc5322)
 pub const NC: u8 = 0b01000000;
-/// token (rfc7230) HTTP/1.1 media type token is only _mostly_ the same so it needs it's own
-/// lookup. While it does not fit perfectly into the crate there is one slot left (and while
-/// there are other thinks they tend to require more than one slot)
+/// `token` (rfc7230) HTTP/1.1 media type token is only _mostly_ the same so it
+/// needs it's own lookup. While it does not fit perfectly into the crate there
+/// is one slot left (and while there are other things they tend to require
+/// more than one slot)
 pub const HT: u8 = 0b10000000;
-
-
 
 pub static US_ASCII_LOOKUP: &[u8] = &[
     //0x00
